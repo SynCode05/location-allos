@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Location – La Foux d’Allos</title>
+<style>
+  :root{
+    --bg:#fafafa;--fg:#111827;--muted:#6b7280;--brand:#2563eb;--card:#fff;--shadow:0 10px 25px rgba(0,0,0,.06);
+    --radius:18px;--radius-lg:22px;--max:1100px
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu;scroll-behavior:smooth}
+  a{color:var(--brand);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .container{max-width:var(--max);margin:0 auto;padding:0 16px}
+
+  /* HERO */
+  header.hero{position:relative;background:url('fond1.jpeg') center/cover no-repeat;height:68vh;color:#fff;display:flex;flex-direction:column;justify-content:center}
+  .topbar{position:absolute;left:0;right:0;top:12px;display:flex;justify-content:space-between;align-items:center;padding:0 16px}
+  .leftbar{display:flex;align-items:center;gap:8px}
+  .chip{backdrop-filter:blur(6px);background:rgba(0,0,0,.35);color:#fff;padding:8px 12px;border-radius:12px;box-shadow:var(--shadow)}
+  .langbar{display:flex;gap:8px;flex-wrap:wrap}
+  .pill{border:none;border-radius:999px;padding:8px 12px;color:#fff;background:rgba(0,0,0,.35);cursor:pointer;box-shadow:var(--shadow)}
+  .pill.active{background:#fff;color:#111827}
+  h1#title{font-size:clamp(28px,4.2vw,46px);margin:0 16px;text-shadow:0 2px 10px rgba(0,0,0,.4)}
+
+  /* MENU BURGER */
+  .burger{border:none;border-radius:12px;background:rgba(0,0,0,.35);color:#fff;width:42px;height:42px;display:grid;place-items:center;cursor:pointer;box-shadow:var(--shadow);font-size:20px}
+  nav.menu{position:fixed;top:0;left:-280px;width:min(82vw,280px);height:100%;background:#111827;color:#fff;transition:left .3s;padding:18px 0;z-index:999;overflow-y:auto}
+  nav.menu.show{left:0}
+  nav.menu h3{margin:10px 16px;font-size:18px}
+  nav.menu a{display:block;padding:12px 16px;color:#fff}
+  nav.menu a:hover{background:#1f2937;text-decoration:none}
+
+  section{padding:38px 0}
+  section h2{font-size:clamp(22px,3vw,30px);margin:0 0 16px;text-align:center}
+  .card{background:var(--card);border-radius:var(--radius-lg);box-shadow:var(--shadow);padding:22px}
+  .muted{color:var(--muted)}
+
+  /* ABOUT */
+  ul#aboutList{list-style:disc;padding-left:1.25rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:.5rem 1rem}
+
+  /* PHOTOS – CAROUSELS */
+  .room{margin-bottom:28px}
+  .room h3{margin:0 0 8px;font-size:20px}
+  .carousel{position:relative;border-radius:var(--radius);overflow:hidden;background:#000}
+  .carousel-track{display:flex;transition:transform .45s ease}
+  .slide{min-width:100%;aspect-ratio:16/9;position:relative}
+  @supports not (aspect-ratio: 1 / 1){.slide{height:56.25vw;max-height:480px}.slide img{height:100%}}
+  .slide img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .controls{display:flex;justify-content:center;gap:.5rem;margin-top:.5rem}
+  .controls button{background:#374151;color:#fff;border:none;border-radius:10px;padding:.35rem .6rem;cursor:pointer}
+
+  /* HOSTS */
+  .host{display:grid;grid-template-columns:130px 1fr;gap:16px;align-items:center}
+  .host img{width:130px;height:130px;border-radius:50%;object-fit:cover;box-shadow:var(--shadow)}
+  @media(max-width:640px){.host{grid-template-columns:1fr}.host img{margin:auto}}
+
+  footer{padding:36px 0;color:var(--muted)}
+
+  /* CTA RÉSERVATIONS (dans le hero, bas droite) */
+  .cta-reserve{
+    position:absolute; right:16px; bottom:16px;
+    display:inline-flex; align-items:center; gap:10px;
+    background:#111827; color:#fff; border:none; border-radius:999px;
+    padding:12px 16px; box-shadow:var(--shadow); text-decoration:none;
+    backdrop-filter:blur(6px); background:rgba(0,0,0,.55)
+  }
+  .cta-reserve:hover{ text-decoration:none; background:rgba(0,0,0,.7) }
+  .cta-reserve .badge{font-size:12px; background:#22c55e; color:#06220f; padding:2px 8px; border-radius:999px}
+</style>
+</head>
+<body>
+  <header class="hero">
+    <div class="topbar">
+      <div class="leftbar">
+        <button id="menuBtn" class="burger" aria-label="Menu">☰</button>
+        <div class="chip">La Foux d’Allos • 1800 m</div>
+      </div>
+      <div class="langbar" id="langbar"></div>
+    </div>
+    <h1 id="title">Splendide appartement skis aux pieds – Piscine & hammam</h1>
+
+    <!-- Bouton Réservations -->
+    <a id="reserveBtn" class="cta-reserve" href="https://www.leboncoin.fr/" target="_blank" rel="noopener">
+      <span id="reserveLabel">Réservations</span>
+      <span class="badge">→</span>
+    </a>
+
+    <!-- Side menu -->
+    <nav id="menu" class="menu" aria-hidden="true">
+      <h3 id="menuTitle">Menu</h3>
+      <a href="#about" id="m-about">À propos</a>
+      <a href="#hosts" id="m-hosts">Hôtes</a>
+      <a href="#photos" id="m-photos">Photos</a>
+      <a href="#reviews" id="m-reviews">Avis</a>
+      <a href="#resort" id="m-resort">Station</a>
+      <a href="#tools" id="m-tools">Outils</a>
+      <a href="#aboutUs" id="m-aboutus">Qui sommes-nous</a>
+    </nav>
+  </header>
+
+  <!-- ABOUT -->
+  <section id="about" class="container">
+    <h2 id="aboutTitle">L’appartement</h2>
+    <div class="card">
+      <ul id="aboutList"></ul>
+    </div>
+  </section>
+
+  <!-- PHOTOS -->
+  <section id="photos" class="container">
+    <h2 id="photosTitle">Photos par pièce</h2>
+    <div id="galleries"></div>
+  </section>
+
+  <!-- REVIEWS -->
+  <section id="reviews" class="container">
+    <h2 id="reviewsTitle">Meilleurs avis</h2>
+    <div id="reviewsBox" class="card"></div>
+  </section>
+
+  <!-- RESORT -->
+  <section id="resort" class="container">
+    <h2 id="resortTitle">La station – Infos utiles</h2>
+    <div class="card">
+      <p id="resortIntro" class="muted" style="margin-bottom:12px"></p>
+      <ul id="resortLinks" style="padding-left:18px"></ul>
+    </div>
+  </section>
+
+  <!-- TOOLS -->
+  <section id="tools" class="container">
+    <h2 id="toolsTitle">Itinéraire & météo</h2>
+    <div class="card" style="display:grid;grid-template-columns:1fr;gap:16px">
+      <div>
+        <label class="muted" id="routeLabel">Votre ville de départ</label>
+        <div style="display:flex;gap:8px;margin-top:6px">
+          <input id="from" class="input" placeholder="Nice, Torino, Genève / London, Köln, Malmö" style="flex:1;border:1px solid #e5e7eb;border-radius:12px;padding:10px 12px" />
+          <button id="routeBtn" class="btnPri" style="background:var(--brand);color:#fff;border:none;border-radius:12px;padding:10px 14px;cursor:pointer">🧭 Voir l’itinéraire</button>
+        </div>
+      </div>
+      <div>
+        <div style="font-weight:600;margin-bottom:8px" id="weatherNow">Météo (actuel)</div>
+        <div id="weather" class="muted">—</div>
+      </div>
+    </div>
+  </section>
+  <!-- QUI SOMMES-NOUS -->
+  <section id="aboutUs" class="container">
+    <h2 id="aboutUsTitle">Qui sommes-nous</h2>
+    <div class="card host">
+      <img src="Nous.jpeg" alt="Les hôtes" />
+      <p id="aboutUsText" class="muted" style="margin:0">Nous sommes un couple de retraités, passionné de montagne. Nous avons mis toute notre energie et notre coeur pour faire de ce lieu un endroit convivial, chaleureux, et confortable. Nous sommes tombés sous le charme de la Foux d'Allos, pour son accueil familial, son enneigement et son ensoleillement sans comparaison. Nous serions très heureux de vous accueillir dans notre appartement, et recueillir vos impressions.</p>
+    </div>
+  </section>
+
+  <footer class="container">
+    <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <div>🏔️ <span id="footer">© Votre nom – Location saisonnière à La Foux d’Allos</span></div>
+      <div style="display:flex;gap:12px" class="muted">La Foux d’Allos • Espace Lumière</div>
+    </div>
+  </footer>
+
+<script>
+// ===== BASIC CONFIG =====
+const HOST_PHOTO = 'Nous.jpeg';
+const RESORT_COORDS = { lat: 44.285285, lon: 6.57096 };
+const RESORT_URLS = {
+  resort: 'https://www.valdallos.com/hiver',
+  skipass: 'https://www.valdallos.ski/fr/',
+  restaurants: 'https://www.valdallos.com/restaurant-autour-de-moi.html'
+};
+
+// URL de réservation (type "Le Bon Coin")
+const RESERVATION_URL = 'https://www.leboncoin.fr/'; // <- modifie ici si besoin
+
+// Your gallery files (ensure file names & extensions match exactly)
+const GALLERY = {
+  salon:['Salon1.jpeg','Salon3.jpeg','Salon2.jpeg'],
+  cuisine:['Cuisine2.jpeg','Cuisine1.jpeg','Cuisine3.jpeg'],
+  chambre:['Ch3.jpeg','Ch2.jpeg','Ch1.jpeg'],
+  litsSuperposes:['Ent1.jpeg','Ent2.jpeg','Ent3.jpeg'],
+  salleDeBain:['SDB1.jpeg','SDB2.jpeg','SDB3.jpeg'],
+  exterieur:['Ext0.jpeg','Ext1.jpeg','Ext3.jpeg'],
+  piscineSpa:['Piscine1.jpeg','Hammam1.jpeg','Piscine2.jpeg']
+};
+
+// ===== MENU TOGGLE =====
+(function(){
+  const btn=document.getElementById('menuBtn');
+  const menu=document.getElementById('menu');
+  if(btn&&menu){
+    btn.addEventListener('click',()=>menu.classList.toggle('show'));
+    menu.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>menu.classList.remove('show')));
+    document.addEventListener('keydown',e=>{ if(e.key==='Escape') menu.classList.remove('show') });
+  }
+})();
+
+// ===== I18N STRINGS =====
+const I18N={
+  fr:{title:"Splendide appartement skis aux pieds – Piscine & hammam",menu:"Menu",about:"L’appartement",photos:"Photos par pièce",reviews:"Meilleurs avis",resort:"La station – Infos utiles",tools:"Itinéraire & météo",aboutus:"Qui sommes-nous",aboutUsTitle:"Qui sommes-nous",aboutUsText:"Nous sommes un couple de retraités, passionné de montagne. Nous avons mis toute notre energie et notre coeur pour faire de ce lieu un endroit convivial, chaleureux, et confortable. Nous sommes tombés sous le charme de la Foux d'Allos, pour son accueil familial, son enneigement et son ensoleillement sans comparaison. Nous serions très heureux de vous accueillir dans notre appartement, et recueillir vos impressions.",resortIntro:"Toutes les infos utiles pour préparer votre séjour à la montagne.",routeLabel:"Votre ville de départ",weatherNow:"Météo (actuel)",footer:"© Votre nom – Location saisonnière à La Foux d’Allos",
+      resortLinkLabels:["Site de la station","Réservation forfaits","Restaurants & activités"], reserve:"Réservations"},
+  en:{title:"Ski-in/Ski-out Apartment – Pool & hammam",menu:"Menu",about:"The apartment",photos:"Photos by room",reviews:"Top reviews",resort:"The resort – Useful info",tools:"Route & Weather",aboutus:"About us",aboutUsTitle:"About us",aboutUsText:"We are a retired couple, passionate about the mountains. We have put all our energy and heart into making this place welcoming, warm, and comfortable. We fell in love with La Foux d'Allos for its family-friendly atmosphere, exceptional snow, and incomparable sunshine. We would be delighted to welcome you to our apartment and hear your impressions.",resortIntro:"All the useful info to prepare your mountain stay.",routeLabel:"Your departure city",weatherNow:"Weather (now)",footer:"© Your name – Holiday rental in La Foux d’Allos",
+      resortLinkLabels:["Resort website","Skipass booking","Restaurants & activities"], reserve:"Bookings"},
+  de:{title:"Ski-in/Ski-out Wohnung – Pool & hammam",menu:"Menü",about:"Die Wohnung",photos:"Fotos nach Zimmer",reviews:"Beste Bewertungen",resort:"Das Skigebiet – Nützliche Infos",tools:"Route & Wetter",aboutus:"Über uns",aboutUsTitle:"Über uns",aboutUsText:"Wir sind ein Rentnerehepaar mit einer Leidenschaft für die Berge. Wir haben all unsere Energie und unser Herz in diesen Ort gesteckt, um ihn einladend, warm und komfortabel zu machen. Wir haben uns in La Foux d'Allos verliebt – wegen der familiären Atmosphäre, der Schneesicherheit und der unvergleichlichen Sonneneinstrahlung. Wir würden uns sehr freuen, Sie in unserer Wohnung willkommen zu heißen und Ihre Eindrücke zu erfahren.",resortIntro:"Alle nützlichen Infos zur Vorbereitung Ihres Aufenthalts.",routeLabel:"Ihre Abfahrtsstadt",weatherNow:"Wetter (aktuell)",footer:"© Ihr Name – Ferienwohnung in La Foux d’Allos",
+      resortLinkLabels:["Website des Skigebiets","Skipässe buchen","Restaurants & Aktivitäten"], reserve:"Reservierungen"},
+  sv:{title:"Fantastisk ski-in/ski-out-lägenhet – Pool & hammam",menu:"Meny",about:"Lägenheten",photos:"Bilder per rum",reviews:"Bästa recensioner",resort:"Orten – Användbar info",tools:"Rutt & väder",aboutus:"Om oss",aboutUsTitle:"Om oss",aboutUsText:"Vi är ett pensionerat par som brinner för bergen. Vi har lagt all vår energi och vårt hjärta på att göra detta till en varm, trivsam och bekväm plats. Vi föll för La Foux d'Allos tack vare den familjevänliga atmosfären, snösäkerheten och det oslagbara solskenet. Vi skulle bli mycket glada att välkomna er till vår lägenhet och ta del av era intryck.",resortIntro:"All användbar info för att förbereda er vistelse i bergen.",routeLabel:"Din avreseort",weatherNow:"Väder (nu)",footer:"© Ditt namn – Semesterboende i La Foux d’Allos",
+      resortLinkLabels:["Ortens webbplats","Köp liftkort","Restauranger & aktiviteter"], reserve:"Bokningar"},
+  da:{title:"Pragtig ski-in/ski-out-lejlighed – Pool & hammam",menu:"Menu",about:"Lejligheden",photos:"Billeder pr. rum",reviews:"Bedste anmeldelser",resort:"Skistedet – Nyttig info",tools:"Rute & vejr",aboutus:"Om os",aboutUsTitle:"Om os",aboutUsText:"Vi er et pensioneret par med passion for bjergene. Vi har lagt al vores energi og hjerte i at gøre dette sted hyggeligt, varmt og komfortabelt. Vi forelskede os i La Foux d'Allos for den familiære atmosfære, den gode snesikkerhed og den enestående sol. Vi vil være meget glade for at byde jer velkommen i vores lejlighed og høre jeres indtryk.",resortIntro:"Al nyttig info til at forberede jeres ophold i bjergene.",routeLabel:"Din afrejsby",weatherNow:"Vejr (aktuelt)",footer:"© Dit navn – Feriebolig i La Foux d’Allos",
+      resortLinkLabels:["Skistedets hjemmeside","Køb liftkort","Restauranter & aktiviteter"], reserve:"Reservationer"},
+  no:{title:"Flott ski-in/ski-out-leilighet – Basseng & hammam",menu:"Meny",about:"Leiligheten", photos:"Bilder per rom",reviews:"Beste anmeldelser",resort:"Stedet – Nyttig info",tools:"Rute & vær",aboutus:"Om oss",aboutUsTitle:"Om oss",aboutUsText:"Vi er et pensjonert par som elsker fjellet. Vi har lagt all vår energi og vårt hjerte i å gjøre dette stedet innbydende, varmt og komfortabelt. Vi falt pladask for La Foux d'Allos – for den familiære stemningen, snøsikkerheten og den unike solen. Vi vil bli veldig glade for å ønske dere velkommen til vår leilighet og høre deres inntrykk.",resortIntro:"All nyttig info for å forberede oppholdet i fjellet.",routeLabel:"Din avreiseby",weatherNow:"Vær (nå)",footer:"© Ditt navn – Ferieleilighet i La Foux d’Allos",
+      resortLinkLabels:["Stedets nettsted","Bestill heiskort","Restauranter & aktiviteter"], reserve:"Bestillinger"}
+};
+
+// Long content per lang
+const LTEXT={
+  fr:{aboutBullets:["38 m² – idéal 4 personnes","1 chambre avec lit double + rangements","2 lits superposés dans l’entrée","Cuisine toute équipée","Salle de bain et WC séparés","Petit extérieur pour le café au soleil","Ski-in/ski-out + local à skis","Piscine intérieure chauffée + hammam","Boulangerie chaque matin","Centre station à 7 min à pied","Linge & serviettes + ménage inclus","Parking gratuit"],
+      reviews:[{name:"Anna (SE)",text:"Emplacement parfait, très propre et bien équipé. Piscine top !"},{name:"Thomas (DE)",text:"Vrai ski-in/ski-out, calme et proche du centre."},{name:"Emily (UK)",text:"Hôte réactif, literie confortable, bel ensoleillement."}],
+      rooms:{salon:"Salon",cuisine:"Cuisine",chambre:"Chambre",litsSuperposes:"Lits superposés",salleDeBain:"Salle de bain",exterieur:"Extérieur",piscineSpa:"Piscine & Hammam"}},
+  en:{aboutBullets:["38 m² – perfect for 4","1 bedroom with double bed & storage","2 bunk beds in the entrance","Fully equipped kitchen","Bathroom and separate toilet","Small outdoor space for morning coffee","True ski-in/ski-out + ski locker","Heated indoor pool + hammam","Bakery every morning","7 min walk to the center","Linen & towels + cleaning included","Free parking"],
+      reviews:[{name:"Anna (SE)",text:"Perfect location, very clean and well equipped. Loved the pool!"},{name:"Thomas (DE)",text:"Real ski-in/ski-out, quiet yet close to the center."},{name:"Emily (UK)",text:"Responsive host, comfy beds, great sunlight."}],
+      rooms:{salon:"Living room",cuisine:"Kitchen",chambre:"Bedroom",litsSuperposes:"Bunk beds",salleDeBain:"Bathroom",exterieur:"Outdoor",piscineSpa:"Pool & Hammam"}},
+  de:{aboutBullets:["38 m² – ideal für 4","1 Schlafzimmer mit Doppelbett & Stauraum","2 Etagenbetten im Eingangsbereich","Voll ausgestattete Küche","Bad und separates WC","Kleine Außenfläche für Morgenkaffee","Echtes Ski-in/Ski/out + Skiraum","Beheiztes Hallenbad + Hammam","Bäckerei jeden Morgen","7 Min. zu Fuß ins Zentrum","Bettwäsche & Handtücher + Endreinigung inkl.","Kostenloses Parken"],
+      reviews:[{name:"Anna (SE)",text:"Perfekte Lage, sehr sauber und gut ausgestattet. Pool top!"},{name:"Thomas (DE)",text:"Echtes Ski-in/Ski-out, ruhig und zentrumsnah."},{name:"Emily (UK)",text:"Reaktionsschneller Gastgeber, bequeme Betten, viel Sonne."}],
+      rooms:{salon:"Wohnzimmer",cuisine:"Küche",chambre:"Schlafzimmer",litsSuperposes:"Etagenbetten",salleDeBain:"Badezimmer",exterieur:"Außenbereich",piscineSpa:"Pool & Hammam"}},
+  sv:{aboutBullets:["38 m² – perfekt för 4","1 sovrum med dubbelsäng & förvaring","2 våningssängar i hallen","Fullt utrustat kök","Badrum och separat toalett","Liten uteplats för morgonkaffe","Äkta ski-in/ski-out + skidförråd","Uppvärmd inomhuspool + hammam","Bageri varje morgon","7 min till centrum","Sängkläder & handdukar + städning ingår","Fri parkering"],
+      reviews:[{name:"Anna (SE)",text:"Perfekt läge, mycket rent och välutrustat. Poolen var toppen!"},{name:"Thomas (DE)",text:"Äkta ski-in/ski-out, lugnt men nära centrum."},{name:"Emily (UK)",text:"Snabb värd, sköna sängar, mycket solsken."}],
+      rooms:{salon:"Vardagsrum",cuisine:"Kök",chambre:"Sovrum",litsSuperposes:"Våningssängar",salleDeBain:"Badrum",exterieur:"Uteplats",piscineSpa:"Pool & Hammam"}},
+  da:{aboutBullets:["38 m² – perfekt til 4","1 soveværelse med dobbeltseng & opbevaring","2 køjesenge i entreen","Fuldt udstyret køkken","Badeværelse og separat toilet","Lille udendørs plads til morgenkaffe","Ægte ski-in/ski-out + skirum","Opvarmet indendørs pool + hammam","Bager hver morgen","7 min til centrum","Sengetøj & håndklæder + slutrengøring inkl.","Gratis parkering"],
+      reviews:[{name:"Anna (SE)",text:"Perfekt beliggenhed, meget rent og veludstyret. Poolen var super!"},{name:"Thomas (DE)",text:"Ægte ski-in/ski-out, roligt men tæt på centrum."},{name:"Emily (UK)",text:"Hurtig vært, gode senge, masser af sol."}],
+      rooms:{salon:"Stue",cuisine:"Køkken",chambre:"Soveværelse",litsSuperposes:"Køjesenge",salleDeBain:"Badeværelse",exterieur:"Udendørs",piscineSpa:"Pool & Hammam"}},
+  no:{aboutBullets:["38 m² – perfekt for 4","1 soverom med dobbeltseng & oppbevaring","2 køyesenger i gangen","Fullt utstyrt kjøkken","Bad og separat toalett","Liten uteplass for morgenkaffe","Ekte ski-in/ski-out + skibod","Oppvarmet innendørsbasseng + hammam","Baker hver morgen","7 min til sentrum","Sengetøy & håndklær + utvask inkludert","Gratis parkering"],
+      reviews:[{name:"Anna (SE)",text:"Perfekt beliggenhet, veldig rent og velutstyrt. Bassenget var topp!"},{name:"Thomas (DE)",text:"Ekte ski-in/ski-out, rolig men nær sentrum."},{name:"Emily (UK)",text:"Rask vert, gode senger, mye sol."}],
+      rooms:{salon:"Stue",cuisine:"Kjøkken",chambre:"Soverom",litsSuperposes:"Køyesenger",salleDeBain:"Bad",exterieur:"Uteplass",piscineSpa:"Basseng & Hammam"}}
+};
+
+// ===== LANGUAGE BAR =====
+const LANGS=[["fr","🇫🇷"],["en","🇬🇧"],["de","🇩🇪"],["sv","🇸🇪"],["da","🇩🇰"],["no","🇳🇴"]];
+let currentLang = localStorage.getItem('lang') || 'fr';
+function renderLangBar(){
+  const bar=document.getElementById('langbar'); if(!bar) return; bar.innerHTML='';
+  LANGS.forEach(([code,flag])=>{
+    const b=document.createElement('button');
+    b.className='pill'+(code===currentLang?' active':'');
+    b.innerHTML=`<span style="margin-right:6px">${flag}</span>${code.toUpperCase()}`;
+    b.onclick=()=>{ currentLang=code; try{localStorage.setItem('lang',code)}catch{}; document.documentElement.lang=code; renderAll(); loadWeather(); };
+    bar.appendChild(b);
+  });
+}
+
+// ===== TRANSLATE STATIC TEXTS =====
+function setText(id,txt){ const el=document.getElementById(id); if(el) el.textContent = txt; }
+function applyTranslations(){
+  const t = I18N[currentLang] || I18N.fr;
+  setText('title', t.title);
+  setText('menuTitle', t.menu);
+  setText('m-about', t.about);
+  setText('m-hosts', t.hosts);
+  setText('m-photos', t.photos);
+  setText('m-reviews', t.reviews);
+  setText('m-resort', t.resort);
+  setText('m-tools', t.tools);
+  setText('m-aboutus', t.aboutus);
+  setText('aboutTitle', t.about);
+  setText('hostsTitle', t.hosts);
+  setText('photosTitle', t.photos);
+  setText('reviewsTitle', t.reviews);
+  setText('resortTitle', t.resort);
+  setText('resortIntro', t.resortIntro);
+  setText('toolsTitle', t.tools);
+  setText('routeLabel', t.routeLabel);
+  setText('weatherNow', t.weatherNow);
+  setText('footer', t.footer);
+  setText('aboutUsTitle', t.aboutUsTitle);
+  setText('aboutUsText', t.aboutUsText);
+  // libellé du bouton Réservations
+  const lbl=document.getElementById('reserveLabel');
+  if(lbl) lbl.textContent = t.reserve || 'Réservations';
+}
+
+// ===== ABOUT LIST =====
+function renderAbout(){
+  const ul=document.getElementById('aboutList'); if(!ul) return; ul.innerHTML='';
+  (LTEXT[currentLang]?.aboutBullets||[]).forEach(t=>{
+    const li=document.createElement('li'); li.textContent=t; ul.appendChild(li);
+  });
+}
+
+// ===== GALLERIES =====
+function makeCarousel(images,label){
+  const wrap=document.createElement('div'); wrap.className='room';
+  const h=document.createElement('h3'); h.textContent=label; wrap.appendChild(h);
+  const car=document.createElement('div'); car.className='carousel';
+  const track=document.createElement('div'); track.className='carousel-track';
+  images.forEach(src=>{
+    const s=document.createElement('div'); s.className='slide';
+    s.innerHTML=`<img src="${src}" alt="${label}" loading="lazy" onerror="this.style.display='none'">`;
+    track.appendChild(s);
+  });
+  car.appendChild(track);
+  const ctr=document.createElement('div'); ctr.className='controls';
+  const prev=document.createElement('button'); prev.textContent='◀';
+  const next=document.createElement('button'); next.textContent='▶';
+  ctr.appendChild(prev); ctr.appendChild(next);
+  let idx=0; const update=()=>{ track.style.transform=`translateX(${-idx*100}%)`; };
+  prev.onclick=()=>{ idx=(idx-1+images.length)%images.length; update(); };
+  next.onclick=()=>{ idx=(idx+1)%images.length; update(); };
+  let sx=0,dx=0; car.addEventListener('touchstart',e=>sx=e.touches[0].clientX,{passive:true});
+  car.addEventListener('touchmove',e=>dx=e.touches[0].clientX-sx,{passive:true});
+  car.addEventListener('touchend',()=>{ if(Math.abs(dx)>40){ if(dx<0) next.onclick(); else prev.onclick(); } sx=dx=0; });
+  wrap.appendChild(car); wrap.appendChild(ctr);
+  return wrap;
+}
+
+function renderGalleries(){
+  const cont=document.getElementById('galleries'); if(!cont) return; cont.innerHTML='';
+  const labels=(LTEXT[currentLang]?.rooms)||LTEXT.fr.rooms;
+  const order=['salon','cuisine','chambre','litsSuperposes','salleDeBain','exterieur','piscineSpa'];
+  order.forEach(key=>{ const imgs=GALLERY[key]; if(Array.isArray(imgs)&&imgs.length){ cont.appendChild(makeCarousel(imgs, labels[key]||key)); }});
+}
+
+// ===== REVIEWS =====
+function renderReviews(){
+  const box=document.getElementById('reviewsBox'); if(!box) return; box.innerHTML='';
+  const arr=(LTEXT[currentLang]?.reviews)||[];
+  const grid=document.createElement('div'); grid.style.display='grid'; grid.style.gridTemplateColumns='repeat(auto-fit,minmax(220px,1fr))'; grid.style.gap='12px';
+  if(!arr.length){ const em=document.createElement('div'); em.className='muted'; em.textContent='—'; grid.appendChild(em); }
+  arr.forEach(r=>{ const card=document.createElement('div'); card.className='card'; card.style.padding='16px'; card.innerHTML=`<div style="font-weight:600;margin-bottom:6px">${r.name||''}</div><div class="muted">${r.text||''}</div>`; grid.appendChild(card); });
+  box.appendChild(grid);
+}
+
+// ===== RESORT LINKS (URLs identical across languages) =====
+function renderResortLinks(){
+  const list=document.getElementById('resortLinks'); if(!list) return; list.innerHTML='';
+  const labels=(I18N[currentLang]?.resortLinkLabels)||I18N.fr.resortLinkLabels;
+  const items=[
+    {href:RESORT_URLS.resort, text:labels[0]},
+    {href:RESORT_URLS.skipass, text:labels[1]},
+    {href:RESORT_URLS.restaurants, text:labels[2]},
+  ];
+  items.forEach(it=>{ const li=document.createElement('li'); li.innerHTML=`<a href="${it.href}" target="_blank">${it.text}</a>`; list.appendChild(li); });
+}
+
+// ===== ROUTE & WEATHER =====
+function bindRoute(){
+  const btn=document.getElementById('routeBtn'); if(!btn) return;
+  btn.onclick=()=>{
+    const origin=(document.getElementById('from')?.value||'').trim();
+    const dest=`${RESORT_COORDS.lat},${RESORT_COORDS.lon}`;
+    const base='https://www.google.com/maps/dir/?api=1';
+    const url=`${base}&destination=${encodeURIComponent(dest)}${origin?`&origin=${encodeURIComponent(origin)}`:''}&travelmode=driving`;
+    window.open(url,'_blank');
+  };
+}
+
+// Met à jour le href du bouton Réservations et le libellé
+function bindReserve(){
+  const a=document.getElementById('reserveBtn');
+  if(!a) return;
+  a.href = RESERVATION_URL;
+  a.setAttribute('aria-label',(I18N[currentLang]?.reserve)||'Réservations');
+}
+
+async function loadWeather(){
+  const box=document.getElementById('weather'); if(!box) return;
+  try{
+    box.textContent='Loading…';
+    const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${RESORT_COORDS.lat}&longitude=${RESORT_COORDS.lon}&current=temperature_2m,weather_code,wind_speed_10m`);
+    const j=await r.json(); const cur=j.current; if(!cur){box.textContent='—';return}
+    const fr={0:'Ciel clair',1:'Plutôt clair',2:'Partiellement nuageux',3:'Couvert',61:'Pluie faible',63:'Pluie',65:'Pluie forte',71:'Neige légère',73:'Neige',75:'Neige forte'};
+    const en={0:'Clear',1:'Mainly clear',2:'Partly cloudy',3:'Overcast',61:'Light rain',63:'Rain',65:'Heavy rain',71:'Light snow',73:'Snow',75:'Heavy snow'};
+    const labelMap=(currentLang==='fr')?fr:en;
+    box.innerHTML=`<div style="display:flex;align-items:center;gap:18px">
+      <div style="font-size:40px;font-weight:700">${Math.round(cur.temperature_2m)}°C</div>
+      <div>
+        <div>${labelMap[cur.weather_code]||''}</div>
+        <div class="muted" style="font-size:14px">Wind ${Math.round(cur.wind_speed_10m)} km/h</div>
+        <div class="muted" style="font-size:12px">Lat ${RESORT_COORDS.lat.toFixed(3)} • Lon ${RESORT_COORDS.lon.toFixed(3)}</div>
+      </div>
+    </div>`;
+  }catch(e){ box.textContent='—'; }
+}
+
+// ===== BOOT =====
+function renderAll(){
+  document.documentElement.lang=currentLang;
+  applyTranslations();
+  renderLangBar();
+  renderAbout();
+  renderGalleries();
+  renderReviews();
+  renderResortLinks();
+  bindReserve(); // <-- s'assure que le bouton a le bon href/label
+  const hp=document.getElementById('hostPhoto'); if(hp && HOST_PHOTO) hp.src = HOST_PHOTO;
+}
+
+(function(){
+  renderAll();
+  bindRoute();
+  loadWeather();
+})();
+</script>
+</body>
+</html>
